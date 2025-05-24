@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feuille d'émargement PDF</title>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <div class="flex justify-between items-center mb-6">
+      <img src="ADEF.png" alt="Logo ADEF" class="h-16">
+      <img src="FAMI.png" alt="Logo UE" class="h-16">
+      <img src="Ministere.png" alt="Logo Ministère" class="h-16">
+    </div>
+    <h1 class="text-xl font-bold mb-4">Génération de la feuille d'émargement</h1>
+
+    <form id="form-filtre" class="space-y-3">
+      <div>
+        <label class="font-semibold">Date :</label>
+        <input type="date" id="filtre-date" class="w-full border p-2 rounded" required />
+      </div>
+      <div>
+        <label class="font-semibold">Type :</label>
+        <select id="filtre-type" class="w-full border p-2 rounded">
+          <option value="">Tous</option>
+          <option value="permanence">Permanence</option>
+          <option value="entretien">Rendez-vous individuel</option>
+        </select>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Générer PDF</button>
+    </form>
+
+    <div id="preview" class="mt-6 hidden bg-white p-4 border">
+      <h2 class="text-center font-bold">Feuille d'émargement</h2>
+      <table class="w-full mt-4 text-sm border">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="border p-1">Date</th>
+            <th class="border p-1">Nom</th>
+            <th class="border p-1">Prénom</th>
+            <th class="border p-1">ESI</th>
+            <th class="border p-1">Type</th>
+            <th class="border p-1">Signature</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Exemple de données simulées
+    const signatures = JSON.parse(localStorage.getItem('signatures') || '[]');
+
+    document.getElementById('form-filtre').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const date = document.getElementById('filtre-date').value;
+      const type = document.getElementById('filtre-type').value;
+
+      const filtered = signatures.filter(s => {
+        const matchDate = s.date === date;
+        const matchType = !type || s.type === type;
+        return matchDate && matchType;
+      });
+
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      filtered.forEach(s => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="border p-1">${s.date}</td>
+          <td class="border p-1">${s.nom}</td>
+          <td class="border p-1">${s.prenom}</td>
+          <td class="border p-1">${s.esi}</td>
+          <td class="border p-1">${s.type}</td>
+          <td class="border p-1"><img src="${s.signatureDataURL}" class="h-10" /></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const preview = document.getElementById('preview');
+      preview.classList.remove('hidden');
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      html2canvas(preview).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+        pdf.save(`feuille_emargement_${date}.pdf`);
+      });
+    });
+  </script>
+</body>
+</html>

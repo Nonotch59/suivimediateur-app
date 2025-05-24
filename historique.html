@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historique des entretiens</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="historique.js"></script>
+</head>
+<body class="relative min-h-screen">
+
+  <!-- Image de fond -->
+  <div class="absolute inset-0">
+    <img src="ADEF_HABITAT_IMAGE.jpg" alt="Photo ADEF" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="relative z-10 flex flex-col items-center justify-start min-h-screen text-white p-6 pt-12">
+
+    <!-- Logo et titre -->
+    <img src="LOGO_ADEF.png" alt="Logo ADEF" class="w-24 mb-4">
+    <h1 class="text-3xl md:text-4xl font-bold mb-2 text-center">Historique des entretiens</h1>
+
+    <!-- Bouton retour accueil -->
+    <a href="index.html" class="text-sm text-white mb-6 underline hover:text-gray-200">
+      ⬅ Retour à l’accueil
+    </a>
+
+    <!-- Filtre -->
+    <label for="residentSelect" class="mb-2 font-semibold">Filtrer par résident :</label>
+    <select id="residentSelect" class="mb-6 text-black px-3 py-2 rounded">
+      <option value="">-- Tous --</option>
+    </select>
+
+    <!-- Tableau -->
+    <div id="table-container" class="w-full max-w-6xl overflow-x-auto bg-white bg-opacity-90 text-black rounded-lg p-4 shadow-lg"></div>
+
+    <!-- Pagination -->
+    <div class="pagination mt-4 text-white">
+      <button onclick="changePage(-1)" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded mr-2">⬅ Précédent</button>
+      <span id="page-number" class="font-semibold">Page 1</span>
+      <button onclick="changePage(1)" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded ml-2">Suivant ➡</button>
+    </div>
+
+  </div>
+
+</body>
+</html>
