@@ -194,89 +194,6 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
   }
 });
 
-// ✅ Initialisation de la signature (à mettre à la fin de ton JS)
-let isDrawing = false;
-let canvas, ctx;
-
-window.addEventListener("DOMContentLoaded", () => {
-  canvas = document.getElementById("signaturePad");
-  if (!canvas) return;
-
-  ctx = canvas.getContext("2d");
-  ctx.lineWidth = 2;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = "#111827";
-
-  canvas.addEventListener("mousedown", (e) => {
-    isDrawing = true;
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-  });
-
-  canvas.addEventListener("mousemove", (e) => {
-    if (!isDrawing) return;
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-  });
-
-  canvas.addEventListener("mouseup", () => isDrawing = false);
-  canvas.addEventListener("mouseout", () => isDrawing = false);
-
-  canvas.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    isDrawing = true;
-    ctx.beginPath();
-    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-  });
-
-  canvas.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    ctx.stroke();
-  });
-
-  canvas.addEventListener("touchend", () => isDrawing = false);
-
-  // 🎯 Bouton EFFACER
-  const effacerBtn = document.getElementById("effacer-signature");
-  if (effacerBtn) {
-    effacerBtn.addEventListener("click", () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
-  }
-
-  // 🎯 Bouton VALIDER
-  const validerBtn = document.getElementById("valider-signature");
-  if (validerBtn) {
-    validerBtn.addEventListener("click", async () => {
-      const dataUrl = canvas.toDataURL();
-      if (dataUrl.length < 2000) {
-        alert("Merci de signer avant de valider.");
-        return;
-      }
-
-      const id_resident = document.getElementById("numero").value;
-      if (!id_resident) {
-        alert("Résident non sélectionné");
-        return;
-      }
-
-      try {
-        const url = await uploadSignatureToFirebase(dataUrl, id_resident);
-        if (!url) return;
-        document.getElementById("signatureModal").classList.add("hidden");
-        envoyerFormulaire(url);
-      } catch (err) {
-        console.error("Erreur Firebase :", err);
-        alert("❌ Erreur lors de l'envoi de la signature.");
-      }
-    });
-  }
-});
 
 // ✅ Fonction d'upload Firebase
 async function uploadSignatureToFirebase(dataUrl, id_resident) {
@@ -325,6 +242,65 @@ function envoyerFormulaire(signatureUrl) {
     }
   });
 }
+
+
+<script>
+// ⚙️ Initialisation complète des boutons "Effacer" et "Valider"
+window.addEventListener("DOMContentLoaded", () => {
+  canvas = document.getElementById("signaturePad");
+  if (!canvas) return;
+
+  ctx = canvas.getContext("2d");
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#111827";
+
+  canvas.addEventListener("mousedown", commencerDessin);
+  canvas.addEventListener("mousemove", dessiner);
+  canvas.addEventListener("mouseup", terminerDessin);
+  canvas.addEventListener("mouseout", terminerDessin);
+
+  canvas.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    commencerDessin({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
+  });
+  canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    dessiner({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
+  });
+  canvas.addEventListener("touchend", terminerDessin);
+
+  // 🔁 Branche les boutons
+  const effacerBtn = document.getElementById("effacer-signature");
+  if (effacerBtn) effacerBtn.addEventListener("click", effacerSignature);
+
+  const validerBtn = document.getElementById("valider-signature");
+  if (validerBtn) validerBtn.addEventListener("click", async () => {
+    const dataUrl = canvas.toDataURL();
+    if (dataUrl.length < 2000) return alert("Merci de signer avant de valider.");
+
+    const id_resident = document.getElementById("numero").value;
+    if (!id_resident) return alert("Résident non sélectionné");
+
+    try {
+      const url = await uploadSignatureToFirebase(dataUrl, id_resident);
+      if (!url) return;
+      document.getElementById("signatureModal").classList.add("hidden");
+      envoyerFormulaire(url);
+    } catch (err) {
+      console.error("Erreur Firebase :", err);
+      alert("❌ Erreur lors de l'envoi de la signature.");
+    }
+  });
+});
+</script>
+
+
+
+
 
 
 
