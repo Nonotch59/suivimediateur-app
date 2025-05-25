@@ -1,3 +1,28 @@
+// ✅ Initialisation dynamique : charger les établissements dès le chargement
+window.addEventListener("DOMContentLoaded", async () => {
+  const selectEtab = document.getElementById("etablissement");
+  selectEtab.innerHTML = '<option value="">-- Choisir un établissement --</option>';
+
+  const { data, error } = await supabaseClient
+    .from("residents")
+    .select("etablissement", { distinct: true });
+
+  if (error) {
+    console.error("Erreur chargement établissements :", error.message);
+    return;
+  }
+
+  // Supprimer doublons si jamais
+  const distincts = [...new Set(data.map((row) => row.etablissement))];
+
+  distincts.forEach((etab) => {
+    const opt = document.createElement("option");
+    opt.value = etab;
+    opt.textContent = etab;
+    selectEtab.appendChild(opt);
+  });
+});
+
 // 🔁 Lorsqu'on change d'établissement
 document.getElementById("etablissement").addEventListener("change", async (e) => {
   const selectedEtab = e.target.value;
@@ -16,11 +41,11 @@ document.getElementById("etablissement").addEventListener("change", async (e) =>
   }
 
   // Extraire noms uniques
-  const nomsUniques = [...new Set(residents.map(r => r.nom))];
+  const nomsUniques = [...new Set(residents.map((r) => r.nom))];
 
   const selectNom = document.getElementById("nom");
   selectNom.innerHTML = '<option value="">-- Choisir un nom --</option>';
-  nomsUniques.forEach(nom => {
+  nomsUniques.forEach((nom) => {
     const opt = document.createElement("option");
     opt.value = nom;
     opt.textContent = nom;
@@ -50,7 +75,7 @@ document.getElementById("nom").addEventListener("change", async () => {
 
   const selectPrenom = document.getElementById("prenom");
   selectPrenom.innerHTML = '<option value="">-- Choisir un prénom --</option>';
-  residents.forEach(r => {
+  residents.forEach((r) => {
     const opt = document.createElement("option");
     opt.value = r.prenom;
     opt.textContent = r.prenom;
@@ -75,7 +100,7 @@ document.getElementById("prenom").addEventListener("change", async () => {
     .single();
 
   if (error) {
-    console.error("Erreur récupération numéro :", error.message);
+    console.error("Erreur récupération numéro unique :", error.message);
     return;
   }
 
@@ -96,6 +121,5 @@ function resetChamps(ids) {
     }
   });
 }
-
 
 
