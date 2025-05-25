@@ -197,5 +197,39 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
 
 
 
+function validerSignature() {
+  console.log("🖊️ Bouton Valider cliqué");
 
+  const canvas = document.getElementById("signaturePad");
+  const dataUrl = canvas.toDataURL();
+  if (dataUrl.length < 2000) return alert("Merci de signer avant de valider.");
 
+  const id_resident = document.getElementById("numero").value;
+  if (!id_resident) return alert("Résident non sélectionné");
+
+  uploadSignatureToFirebase(dataUrl, id_resident)
+    .then(firebasePath => {
+      if (!firebasePath) return;
+      document.getElementById("signatureModal").classList.add("hidden");
+      envoyerFormulaire(firebasePath);
+    })
+    .catch(err => {
+      console.error("Erreur Firebase :", err);
+      alert("❌ Erreur lors de l'envoi de la signature.");
+    });
+}
+
+async function uploadSignatureToFirebase(dataUrl, id_resident) {
+  try {
+    const fileName = `signatures/${id_resident}_${Date.now()}.png`;
+    const storageRef = firebase.storage().ref().child(fileName);
+
+    await storageRef.putString(dataUrl, 'data_url');
+    const downloadURL = await storageRef.getDownloadURL();
+    console.log("✅ Signature enregistrée sur Firebase :", downloadURL);
+    return downloadURL;
+  } catch (err) {
+    console.error("❌ Erreur Firebase :", err);
+    return null;
+  }
+}
