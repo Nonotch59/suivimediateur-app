@@ -1,29 +1,41 @@
-// ✅ Initialisation dynamique : charger les établissements dès le chargement
-window.addEventListener("DOMContentLoaded", async () => {
-  const selectEtab = document.getElementById("etablissement");
-  selectEtab.innerHTML = '<option value="">-- Choisir un établissement --</option>';
+// 🧹 Fonction pour réinitialiser certains champs
+function resetChamps(ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === "SELECT") {
+        el.innerHTML = '<option value="">-- Choisir --</option>';
+      } else {
+        el.value = "";
+      }
+    }
+  });
+}
 
-  const { data, error } = await supabaseClient
+// 🔁 Lors du chargement de la page : charger les établissements
+window.addEventListener("DOMContentLoaded", async () => {
+  const { data: residents, error } = await supabaseClient
     .from("residents")
-    .select("etablissement", { distinct: true });
+    .select("etablissement");
 
   if (error) {
-    console.error("Erreur chargement établissements :", error.message);
+    console.error("❌ Erreur chargement des établissements :", error.message);
     return;
   }
 
-  // Supprimer doublons si jamais
-  const distincts = [...new Set(data.map((row) => row.etablissement))];
+  const etablissements = [...new Set(residents.map(r => r.etablissement))];
+  console.log("✅ Établissements trouvés :", etablissements);
 
-  distincts.forEach((etab) => {
+  const selectEtab = document.getElementById("etablissement");
+  etablissements.forEach(e => {
     const opt = document.createElement("option");
-    opt.value = etab;
-    opt.textContent = etab;
+    opt.value = e;
+    opt.textContent = e;
     selectEtab.appendChild(opt);
   });
 });
 
-// 🔁 Lorsqu'on change d'établissement
+// 🔁 Lorsqu’on change d’établissement
 document.getElementById("etablissement").addEventListener("change", async (e) => {
   const selectedEtab = e.target.value;
   resetChamps(["nom", "prenom", "numero_unique", "esi"]);
@@ -32,94 +44,59 @@ document.getElementById("etablissement").addEventListener("change", async (e) =>
 
   const { data: residents, error } = await supabaseClient
     .from("residents")
-    .select("nom")
+    .select("*")
     .eq("etablissement", selectedEtab);
 
   if (error) {
-    console.error("Erreur chargement noms :", error.message);
+    console.error("❌ Erreur chargement résidents :", error.message);
     return;
   }
 
-  // Extraire noms uniques
-  const nomsUniques = [...new Set(residents.map((r) => r.nom))];
-
+  const nomsUniques = [...new Set(residents.map(r => r.nom))];
   const selectNom = document.getElementById("nom");
   selectNom.innerHTML = '<option value="">-- Choisir un nom --</option>';
-  nomsUniques.forEach((nom) => {
+  nomsUniques.forEach(nom => {
     const opt = document.createElement("option");
     opt.value = nom;
     opt.textContent = nom;
     selectNom.appendChild(opt);
   });
+
+  // 🔄 Enregistrer les résidents filtrés pour plus tard (utilisé pour le prénom)
+  window.residentsFiltres = residents;
 });
 
-// 🔁 Lorsqu'on change de nom
-document.getElementById("nom").addEventListener("change", async () => {
-  const etab = document.getElementById("etablissement").value;
-  const nom = document.getElementById("nom").value;
+// 🔁 Lorsqu’on choisit un prénom
+document.getElementById("prenom").addEventListener("change", (e) => {
+  const prenomChoisi = e.target.value;
+  const nomChoisi = document.getElementById("nom").value;
 
-  resetChamps(["prenom", "numero_unique", "esi"]);
+  const resident = (window.residentsFiltres || []).find(
+    r => r.nom === nomChoisi && r.prenom === prenomChoisi
+  );
 
-  if (!etab || !nom) return;
-
-  const { data: residents, error } = await supabaseClient
-    .from("residents")
-    .select("prenom")
-    .eq("etablissement", etab)
-    .eq("nom", nom);
-
-  if (error) {
-    console.error("Erreur chargement prénoms :", error.message);
-    return;
+  if (resident) {
+    document.getElementById("numero_unique").value = resident.numero_unique || "";
+    document.getElementById("esi").value = resident.esi || "";
   }
+});
+
+// 🔁 Lorsqu’on choisit un nom → charger les prénoms correspondants
+document.getElementById("nom").addEventListener("change", (e) => {
+  const nomChoisi = e.target.value;
+  const residents = window.residentsFiltres || [];
+
+  const prenomsUniques = [...new Set(
+    residents.filter(r => r.nom === nomChoisi).map(r => r.prenom)
+  )];
 
   const selectPrenom = document.getElementById("prenom");
   selectPrenom.innerHTML = '<option value="">-- Choisir un prénom --</option>';
-  residents.forEach((r) => {
+  prenomsUniques.forEach(prenom => {
     const opt = document.createElement("option");
-    opt.value = r.prenom;
-    opt.textContent = r.prenom;
+    opt.value = prenom;
+    opt.textContent = prenom;
     selectPrenom.appendChild(opt);
   });
 });
-
-// 🔁 Lorsqu'on change de prénom
-document.getElementById("prenom").addEventListener("change", async () => {
-  const etab = document.getElementById("etablissement").value;
-  const nom = document.getElementById("nom").value;
-  const prenom = document.getElementById("prenom").value;
-
-  if (!etab || !nom || !prenom) return;
-
-  const { data, error } = await supabaseClient
-    .from("residents")
-    .select("numero_unique, esi")
-    .eq("etablissement", etab)
-    .eq("nom", nom)
-    .eq("prenom", prenom)
-    .single();
-
-  if (error) {
-    console.error("Erreur récupération numéro unique :", error.message);
-    return;
-  }
-
-  document.getElementById("numero_unique").value = data.numero_unique || "";
-  document.getElementById("esi").value = data.esi || "";
-});
-
-// 🔄 Fonction pour reset les champs dépendants
-function resetChamps(ids) {
-  ids.forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    if (el.tagName === "SELECT") {
-      el.innerHTML = `<option value="">-- Choisir ${id} --</option>`;
-    } else {
-      el.value = "";
-    }
-  });
-}
-
 
