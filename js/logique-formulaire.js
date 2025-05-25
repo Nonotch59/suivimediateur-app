@@ -292,3 +292,39 @@ async function uploadSignatureToFirebase(dataUrl, id_resident) {
     return null;
   }
 }
+
+
+
+
+
+function envoyerFormulaire(signatureUrl) {
+  const type_entretien = document.getElementById("type_entretien").value;
+  const theme = document.getElementById("theme").value;
+  const notes = document.getElementById("notes").value;
+
+  if (!residentSelectionne || !type_entretien || !theme) {
+    alert("Merci de remplir tous les champs obligatoires.");
+    return;
+  }
+
+  supabaseClient.from("entretiens").insert([{
+    type_entretien,
+    themes_abordes: [theme],
+    notes,
+    id_resident: residentSelectionne.id,
+    signature_url: signatureUrl  // ✅ Envoi de l'URL de signature dans la base
+  }]).then(({ error }) => {
+    if (error) {
+      console.error("❌ Erreur enregistrement avec signature :", error.message);
+      alert("Erreur lors de l'enregistrement.");
+    } else {
+      alert("✅ Entretien enregistré avec signature !");
+      document.getElementById("formulaire-entretien").reset();
+      resetChamps(["nom", "prenom", "numero_unique", "esi"]);
+      residentSelectionne = null;
+    }
+  });
+}
+
+
+
