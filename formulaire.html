@@ -213,28 +213,7 @@ document.getElementById('prenom').addEventListener('change', () => {
 
 
 <script>
-// Soumission du formulaire (sans signature)
-document.getElementById('form-entretien').addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (!idResidentGlobal) return alert("Veuillez sélectionner un résident.");
 
-  const type_entretien = document.getElementById('type_entretien').value;
-  const themes_abordes = [document.getElementById('theme').value];
-  const notes = document.getElementById('notes').value;
-
-  fetch('/entretien', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id_resident: idResidentGlobal, type_entretien, themes_abordes, notes })
-  })
-  .then(res => res.json())
-  .then(() => {
-    alert("Entretien enregistré !");
-    document.getElementById('form-entretien').reset();
-    document.getElementById('numero').value = '';
-    loadHistorique(idResidentGlobal);
-  });
-});
 
 // Fonction appelée après signature - VERSION CORRIGÉE
 function envoyerFormulaire(signaturePath) {
@@ -256,7 +235,7 @@ function envoyerFormulaire(signaturePath) {
   .then(res => res.json())
   .then(() => {
     alert("✅ Entretien enregistré avec signature !");
-    document.getElementById('form-entretien').reset();
+    document.getElementById('formulaire-entretien').reset();
     document.getElementById('numero').value = '';
     loadHistorique(idResidentGlobal);
   })
