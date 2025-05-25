@@ -14,8 +14,8 @@ function resetChamps(ids) {
 
 let residentSelectionne = null;
 
-// 🔁 Lors du chargement de la page : charger les établissements
-window.addEventListener("DOMContentLoaded", async () => {
+// ✅ Fonction pour charger les établissements sans doublons
+async function chargerEtablissements() {
   const { data: residents, error } = await supabaseClient
     .from("residents")
     .select("etablissement");
@@ -29,15 +29,73 @@ window.addEventListener("DOMContentLoaded", async () => {
   console.log("✅ Établissements trouvés :", etablissements);
 
   const selectEtab = document.getElementById("etablissement");
+  selectEtab.innerHTML = '<option value="">-- Choisir un établissement --</option>';
   etablissements.forEach(e => {
     const opt = document.createElement("option");
     opt.value = e;
     opt.textContent = e;
     selectEtab.appendChild(opt);
   });
+}
+
+// 🔁 Initialisation globale au chargement
+window.addEventListener("DOMContentLoaded", () => {
+  chargerEtablissements();
+
+  const ouvrirBtn = document.getElementById("ouvrir-signature");
+  const fermerBtn = document.getElementById("fermer-signature");
+  const modale = document.getElementById("modale-signature");
+
+  if (ouvrirBtn && fermerBtn && modale) {
+    ouvrirBtn.addEventListener("click", () => modale.classList.remove("hidden"));
+    fermerBtn.addEventListener("click", () => modale.classList.add("hidden"));
+  }
+
+  const canvas = document.getElementById("canvas-signature");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
+    function drawLine(x, y) {
+      if (!isDrawing) return;
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#111827";
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      [lastX, lastY] = [x, y];
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      isDrawing = true;
+      [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+    canvas.addEventListener("mousemove", (e) => drawLine(e.offsetX, e.offsetY));
+    canvas.addEventListener("mouseup", () => isDrawing = false);
+    canvas.addEventListener("mouseout", () => isDrawing = false);
+
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      isDrawing = true;
+      lastX = touch.clientX - rect.left;
+      lastY = touch.clientY - rect.top;
+    });
+    canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      drawLine(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+    canvas.addEventListener("touchend", () => isDrawing = false);
+  }
 });
 
-// 🔁 Lorsqu’on change d’établissement
+// 🔁 Établissement → résidents
 document.getElementById("etablissement").addEventListener("change", async (e) => {
   const selectedEtab = e.target.value;
   resetChamps(["nom", "prenom", "numero_unique", "esi"]);
@@ -68,23 +126,7 @@ document.getElementById("etablissement").addEventListener("change", async (e) =>
   window.residentsFiltres = residents;
 });
 
-// 🔁 Lorsqu’on choisit un prénom
-document.getElementById("prenom").addEventListener("change", (e) => {
-  const prenomChoisi = e.target.value;
-  const nomChoisi = document.getElementById("nom").value;
-
-  const resident = (window.residentsFiltres || []).find(
-    r => r.nom === nomChoisi && r.prenom === prenomChoisi
-  );
-
-  if (resident) {
-    residentSelectionne = resident;
-    document.getElementById("numero_unique").value = resident.numero_unique || "";
-    document.getElementById("esi").value = resident.esi || "";
-  }
-});
-
-// 🔁 Lorsqu’on choisit un nom → charger les prénoms correspondants
+// 🔁 Nom → prénoms
 document.getElementById("nom").addEventListener("change", (e) => {
   const nomChoisi = e.target.value;
   const residents = window.residentsFiltres || [];
@@ -103,7 +145,23 @@ document.getElementById("nom").addEventListener("change", (e) => {
   });
 });
 
-// ✅ Bloc 3 : Enregistrement de l’entretien
+// 🔁 Prénom → détails
+document.getElementById("prenom").addEventListener("change", (e) => {
+  const prenomChoisi = e.target.value;
+  const nomChoisi = document.getElementById("nom").value;
+
+  const resident = (window.residentsFiltres || []).find(
+    r => r.nom === nomChoisi && r.prenom === prenomChoisi
+  );
+
+  if (resident) {
+    residentSelectionne = resident;
+    document.getElementById("numero_unique").value = resident.numero_unique || "";
+    document.getElementById("esi").value = resident.esi || "";
+  }
+});
+
+// ✅ Enregistrement entretien
 document.getElementById("formulaire-entretien").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -116,16 +174,14 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
     return;
   }
 
-  const { data, error } = await supabaseClient
+  const { error } = await supabaseClient
     .from("entretiens")
-    .insert([
-      {
-        type_entretien,
-        themes_abordes: [theme],
-        notes,
-        id_resident: residentSelectionne.id
-      },
-    ]);
+    .insert([{
+      type_entretien,
+      themes_abordes: [theme],
+      notes,
+      id_resident: residentSelectionne.id
+    }]);
 
   if (error) {
     console.error("❌ Erreur enregistrement :", error.message);
@@ -137,78 +193,6 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
     residentSelectionne = null;
   }
 });
-
-
-  // 🟦 Affichage de la modale de signature
-  const ouvrirBtn = document.getElementById("ouvrir-signature");
-  const fermerBtn = document.getElementById("fermer-signature");
-  const modale = document.getElementById("modale-signature");
-
-  if (!ouvrirBtn || !fermerBtn || !modale) {
-    console.warn("❗ Boutons ou modale non trouvés dans le DOM.");
-    return;
-  }
-
-  ouvrirBtn.addEventListener("click", () => {
-    modale.classList.remove("hidden");
-  });
-
-  fermerBtn.addEventListener("click", () => {
-    modale.classList.add("hidden");
-  });
-
-  // 🎨 Activation du dessin sur le canvas
-  const canvas = document.getElementById("canvas-signature");
-  if (!canvas) {
-    console.warn("❗ Canvas non trouvé !");
-    return;
-  }
-
-  const ctx = canvas.getContext("2d");
-  let isDrawing = false;
-  let lastX = 0;
-  let lastY = 0;
-
-  function drawLine(x, y) {
-    if (!isDrawing) return;
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#111827";
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    [lastX, lastY] = [x, y];
-  }
-
-  canvas.addEventListener("mousedown", (e) => {
-    isDrawing = true;
-    [lastX, lastY] = [e.offsetX, e.offsetY];
-  });
-
-  canvas.addEventListener("mousemove", (e) => drawLine(e.offsetX, e.offsetY));
-  canvas.addEventListener("mouseup", () => (isDrawing = false));
-  canvas.addEventListener("mouseout", () => (isDrawing = false));
-
-  canvas.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    isDrawing = true;
-    lastX = touch.clientX - rect.left;
-    lastY = touch.clientY - rect.top;
-  });
-
-  canvas.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    drawLine(touch.clientX - rect.left, touch.clientY - rect.top);
-  });
-
-  canvas.addEventListener("touchend", () => (isDrawing = false));
-});
-
 
 
 
