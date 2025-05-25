@@ -108,13 +108,26 @@
     </form>
   </div>
 
-  <!-- 🔒 Modale de signature -->
-  <div id="modale-signature" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-4 rounded-lg shadow-lg">
-      <p class="text-center">Signature ici (à venir)</p>
-      <button id="fermer-signature" class="mt-4 px-4 py-2 bg-gray-600 text-white rounded">Fermer</button>
+  <!-- 🧾 Bloc 4.1 – Modale avec canvas de signature -->
+<div id="modale-signature" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-xl font-bold text-center mb-4">✍️ Signez ci-dessous</h2>
+
+    <!-- 🖌️ Zone de dessin -->
+    <canvas id="canvas-signature" width="300" height="150" class="border border-gray-400 w-full rounded"></canvas>
+
+    <!-- 🧹 Boutons Effacer + Valider -->
+    <div class="mt-4 flex justify-between">
+      <button id="effacer-signature" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Effacer</button>
+      <button id="valider-signature" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Valider</button>
+    </div>
+
+    <!-- ❌ Bouton pour fermer -->
+    <div class="mt-4 text-center">
+      <button id="fermer-signature" class="text-sm text-gray-500 underline">Fermer sans enregistrer</button>
     </div>
   </div>
+</div>  
 </body>
 </html>
 
