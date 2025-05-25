@@ -138,6 +138,7 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
   }
 });
 
+
 window.addEventListener("DOMContentLoaded", async () => {
   // 🔁 Charger établissements
   const { data: residents, error } = await supabaseClient
@@ -160,27 +161,32 @@ window.addEventListener("DOMContentLoaded", async () => {
     selectEtab.appendChild(opt);
   });
 
-  // 🟦 Bloc 4.2 – Affichage de la modale de signature
+  // 🟦 Affichage de la modale de signature
   const ouvrirBtn = document.getElementById("ouvrir-signature");
   const fermerBtn = document.getElementById("fermer-signature");
   const modale = document.getElementById("modale-signature");
 
-  if (ouvrirBtn && fermerBtn && modale) {
-    ouvrirBtn.addEventListener("click", () => {
-      modale.classList.remove("hidden");
-    });
-
-    fermerBtn.addEventListener("click", () => {
-      modale.classList.add("hidden");
-    });
-  } else {
+  if (!ouvrirBtn || !fermerBtn || !modale) {
     console.warn("❗ Boutons ou modale non trouvés dans le DOM.");
+    return;
   }
 
-  // 🎨 Bloc 4.3 – Activation du dessin sur le canvas
-  const canvas = document.getElementById("canvas-signature");
-  const ctx = canvas.getContext("2d");
+  ouvrirBtn.addEventListener("click", () => {
+    modale.classList.remove("hidden");
+  });
 
+  fermerBtn.addEventListener("click", () => {
+    modale.classList.add("hidden");
+  });
+
+  // 🎨 Activation du dessin sur le canvas
+  const canvas = document.getElementById("canvas-signature");
+  if (!canvas) {
+    console.warn("❗ Canvas non trouvé !");
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
   let isDrawing = false;
   let lastX = 0;
   let lastY = 0;
