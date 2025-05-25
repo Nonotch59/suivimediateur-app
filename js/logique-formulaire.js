@@ -138,14 +138,23 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
   }
 });
 
-// 🟦 Bloc 4.2 – Affichage de la modale de signature
-document.getElementById("ouvrir-signature").addEventListener("click", () => {
-  document.getElementById("modale-signature").classList.remove("hidden");
-});
+window.addEventListener("DOMContentLoaded", () => {
+  // 🟦 Bloc 4.2 – Affichage de la modale de signature
+  const ouvrirBtn = document.getElementById("ouvrir-signature");
+  const fermerBtn = document.getElementById("fermer-signature");
+  const modale = document.getElementById("modale-signature");
 
-// ❌ Fermer la signature
-document.getElementById("fermer-signature").addEventListener("click", () => {
-  document.getElementById("modale-signature").classList.add("hidden");
+  if (ouvrirBtn && fermerBtn && modale) {
+    ouvrirBtn.addEventListener("click", () => {
+      modale.classList.remove("hidden");
+    });
+
+    fermerBtn.addEventListener("click", () => {
+      modale.classList.add("hidden");
+    });
+  } else {
+    console.warn("❗ Boutons ou modale non trouvés dans le DOM.");
+  }
 });
 
 
