@@ -449,18 +449,17 @@ async function uploadSignatureToFirebase(dataUrl, id_resident) {
 </script>
   
 
-  <!-- Signature modal -->
+<!-- Signature modal -->
 <div id="signatureModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
   <div class="bg-white p-4 rounded shadow-md w-full max-w-md text-black">
-    <h2 class="text-xl font-bold mb-2">Signature du résident</h2>
+    <h2 class="text-xl font-bold mb-2">✍️ Signez ci-dessous</h2>
     <canvas id="signaturePad" class="border w-full h-40"></canvas>
     <div class="flex justify-between mt-4">
-      <button onclick="effacerSignature()" class="px-4 py-1 bg-gray-300 rounded">Effacer</button>
-      <button onclick="validerSignature()" class="px-4 py-1 bg-green-600 text-white rounded">Valider</button>
+      <button id="effacer-signature" class="px-4 py-1 bg-gray-300 rounded">Effacer</button>
+      <button id="valider-signature" class="px-4 py-1 bg-green-600 text-white rounded">Valider</button>
     </div>
   </div>
 </div>
-
 
 
   
