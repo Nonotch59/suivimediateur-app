@@ -16,17 +16,106 @@
   <!-- 🧠 Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <!-- 🚀 Scripts personnalisés -->
+  <!-- 🚀 Mes scripts -->
   <script defer src="js/firebase.js"></script>
   <script defer src="js/supabase.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
 
-  <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold text-center">🔧 Initialisation réussie</h1>
-    <p class="text-center mt-2">Firebase & Supabase sont prêts.</p>
+<body class="bg-gray-100 text-gray-900">
+  <div class="container mx-auto p-6 max-w-3xl bg-white shadow-md rounded-xl">
+    <h1 class="text-2xl font-bold text-center mb-6">📝 Enregistrement d’un Entretien</h1>
+
+    <form id="formulaire-entretien" class="space-y-4">
+
+      <!-- Établissement -->
+      <div>
+        <label for="etablissement" class="block font-medium">Établissement *</label>
+        <select id="etablissement" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un établissement --</option>
+          <option value="bobigny">Bobigny</option>
+          <option value="pantin">Pantin</option>
+          <option value="noisy">Noisy-le-Sec</option>
+        </select>
+      </div>
+
+      <!-- Nom -->
+      <div>
+        <label for="nom" class="block font-medium">Nom *</label>
+        <select id="nom" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un nom --</option>
+        </select>
+      </div>
+
+      <!-- Prénom -->
+      <div>
+        <label for="prenom" class="block font-medium">Prénom *</label>
+        <select id="prenom" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un prénom --</option>
+        </select>
+      </div>
+
+      <!-- Numéro unique -->
+      <div>
+        <label for="numero_unique" class="block font-medium mt-2">Numéro unique</label>
+        <input type="text" id="numero_unique" class="w-full p-2 border rounded bg-gray-100" readonly>
+      </div>
+
+      <!-- ESI -->
+      <div>
+        <label for="esi" class="block font-medium mt-2">ESI (logement)</label>
+        <input type="text" id="esi" class="w-full p-2 border rounded bg-gray-100" readonly>
+      </div>
+
+      <!-- Type d’entretien -->
+      <div>
+        <label for="type_entretien" class="block font-medium">Type d’entretien *</label>
+        <select id="type_entretien" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un type --</option>
+          <option value="individuel">Entretien individuel</option>
+          <option value="permanence">Permanence</option>
+        </select>
+      </div>
+
+      <!-- Thème -->
+      <div>
+        <label for="theme" class="block font-medium">Thème *</label>
+        <select id="theme" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un thème --</option>
+          <option value="logement">Logement</option>
+          <option value="emploi">Emploi</option>
+          <option value="santé">Santé</option>
+          <option value="administratif">Administratif</option>
+        </select>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label for="notes" class="block font-medium">Notes / remarques</label>
+        <textarea id="notes" rows="4" class="w-full p-2 border rounded"></textarea>
+      </div>
+
+      <!-- Signature -->
+      <div class="text-center">
+        <button type="button" id="ouvrir-signature" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          ✍️ Ajouter une signature
+        </button>
+      </div>
+
+      <!-- Soumission -->
+      <div class="text-center">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
+          ✅ Enregistrer l’entretien
+        </button>
+      </div>
+    </form>
   </div>
 
+  <!-- 🔒 Modale de signature (vide pour l’instant) -->
+  <div id="modale-signature" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-4 rounded-lg shadow-lg">
+      <p class="text-center">Signature ici (à venir)</p>
+      <button id="fermer-signature" class="mt-4 px-4 py-2 bg-gray-600 text-white rounded">Fermer</button>
+    </div>
+  </div>
 </body>
 </html>
-
