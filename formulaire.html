@@ -367,16 +367,6 @@ let isDrawing = false;
 let canvas = null;
 let ctx = null;
 
-function ouvrirSignature() {
-  document.getElementById("signatureModal").classList.remove("hidden");
-  canvas = document.getElementById("signaturePad");
-  ctx = canvas.getContext("2d");
-  ctx.lineWidth = 2;
-  canvas.addEventListener("mousedown", commencerDessin);
-  canvas.addEventListener("mouseup", terminerDessin);
-  canvas.addEventListener("mousemove", dessiner);
-}
-
 function commencerDessin(e) {
   isDrawing = true;
   ctx.beginPath();
@@ -396,50 +386,6 @@ function dessiner(e) {
 function effacerSignature() {
   if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
-
-function validerSignature() {
-  const dataUrl = canvas.toDataURL();
-  if (dataUrl.length < 2000) return alert("Merci de signer avant de valider.");
-
-  const id_resident = document.getElementById("numero").value;
-  if (!id_resident) return alert("Résident non sélectionné");
-
-  uploadSignatureToFirebase(dataUrl, id_resident)
-    .then(firebasePath => {
-      if (!firebasePath) return;
-      document.getElementById("signatureModal").classList.add("hidden");
-      envoyerFormulaire(firebasePath);
-    })
-    .catch(err => {
-      console.error("Erreur Firebase :", err);
-      alert("❌ Erreur lors de l'envoi de la signature.");
-    });
-}
-
-async function uploadSignatureToFirebase(dataUrl, id_resident) {
-  try {
-    const fileName = `signatures/${id_resident}_${Date.now()}.png`;
-    const storageRef = firebase.storage().ref().child(fileName);
-
-    console.log("📤 Envoi de la signature...");
-    console.log("➡ Nom de fichier :", fileName);
-    console.log("➡ Début du DataURL :", dataUrl.substring(0, 50));
-
-    await storageRef.putString(dataUrl, 'data_url');
-
-    const downloadURL = await storageRef.getDownloadURL();
-    console.log("✅ URL de la signature :", downloadURL);
-
-    alert("✅ Signature enregistrée dans Firebase !");
-    return downloadURL;
-  } catch (err) {
-    console.error("❌ Erreur Firebase :", err);
-    alert("❌ Erreur lors de l'envoi de la signature : " + err.message);
-    return null;
-  }
-}
-
-
 
 
 
