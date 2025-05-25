@@ -295,10 +295,3 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
-
-
-
-
-
-
