@@ -230,3 +230,42 @@ async function uploadSignatureToFirebase(dataUrl, id_resident) {
     return null;
   }
 }
+
+// 🔗 Lier les boutons "Valider" et "Effacer"
+window.addEventListener("DOMContentLoaded", () => {
+  const btnValider = document.getElementById("valider-signature");
+  const btnEffacer = document.getElementById("effacer-signature");
+  const canvas = document.getElementById("canvas-signature");
+  const ctx = canvas?.getContext("2d");
+
+  // ✅ Valider la signature
+  if (btnValider && canvas) {
+    btnValider.addEventListener("click", () => {
+      const dataUrl = canvas.toDataURL();
+      if (dataUrl.length < 2000) return alert("Merci de signer avant de valider.");
+      const id_resident = document.getElementById("numero_unique").value;
+      if (!id_resident) return alert("Résident non sélectionné");
+
+      uploadSignatureToFirebase(dataUrl, id_resident)
+        .then(url => {
+          if (!url) return;
+          document.getElementById("modale-signature").classList.add("hidden");
+          envoyerFormulaire(url);
+        })
+        .catch(err => {
+          console.error("❌ Erreur Firebase :", err);
+          alert("❌ Erreur lors de l'envoi de la signature.");
+        });
+    });
+  }
+
+  // 🧹 Effacer la signature
+  if (btnEffacer && ctx) {
+    btnEffacer.addEventListener("click", () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+  }
+});
+
+
+
