@@ -100,3 +100,53 @@ document.getElementById("nom").addEventListener("change", (e) => {
   });
 });
 
+
+// ✅ Bloc 3 : Enregistrement de l’entretien
+document.getElementById("formulaire-entretien").addEventListener("submit", async (e) => {
+  e.preventDefault(); // empêche l'envoi classique
+
+  const etablissement = document.getElementById("etablissement").value;
+  const nom = document.getElementById("nom").value;
+  const prenom = document.getElementById("prenom").value;
+  const numero_unique = document.getElementById("numero_unique").value;
+  const esi = document.getElementById("esi").value;
+  const type_entretien = document.getElementById("type_entretien").value;
+  const theme = document.getElementById("theme").value;
+  const notes = document.getElementById("notes").value;
+
+  if (!etablissement || !nom || !prenom || !type_entretien || !theme) {
+    alert("Merci de remplir tous les champs obligatoires.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("entretiens")
+    .insert([
+      {
+        etablissement,
+        nom,
+        prenom,
+        numero_unique,
+        esi,
+        type_entretien,
+        themes_abordes: [theme], // ⚠️ tableau car c’est un champ array
+        notes
+        // 📌 La date est automatiquement ajoutée par Supabase (now())
+      },
+    ]);
+
+  if (error) {
+    console.error("❌ Erreur enregistrement :", error.message);
+    alert("Erreur lors de l'enregistrement. Voir console.");
+  } else {
+    alert("✅ Entretien enregistré !");
+    document.getElementById("formulaire-entretien").reset();
+    resetChamps(["nom", "prenom", "numero_unique", "esi"]);
+  }
+});
+
+
+
+
+
+
