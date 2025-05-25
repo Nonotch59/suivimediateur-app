@@ -295,7 +295,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-</script>
 
 
 
