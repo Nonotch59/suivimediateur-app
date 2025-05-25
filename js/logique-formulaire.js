@@ -138,6 +138,15 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
   }
 });
 
+// 🟦 Bloc 4.2 – Affichage de la modale de signature
+document.getElementById("ouvrir-signature").addEventListener("click", () => {
+  document.getElementById("modale-signature").classList.remove("hidden");
+});
+
+// ❌ Fermer la signature
+document.getElementById("fermer-signature").addEventListener("click", () => {
+  document.getElementById("modale-signature").classList.add("hidden");
+});
 
 
 
