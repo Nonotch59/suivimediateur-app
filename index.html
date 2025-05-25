@@ -8,7 +8,7 @@
   <!-- 🎨 Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 🔌 Firebase SDK v8 -->
+  <!-- 🔌 Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
@@ -16,7 +16,7 @@
   <!-- 🧠 Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <!-- 🚀 Mes scripts -->
+  <!-- 🚀 Scripts locaux -->
   <script defer src="js/firebase.js"></script>
   <script defer src="js/supabase.js"></script>
   <script defer src="js/logique-formulaire.js"></script>
@@ -31,11 +31,9 @@
       <!-- Établissement -->
       <div>
         <label for="etablissement" class="block font-medium">Établissement *</label>
-        
-<select id="etablissement" required class="w-full p-2 border rounded">
-  <option value="">-- Choisir un établissement --</option>
-</select>
-
+        <select id="etablissement" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un établissement --</option>
+        </select>
       </div>
 
       <!-- Nom -->
@@ -56,14 +54,14 @@
 
       <!-- Numéro unique -->
       <div>
-        <label for="numero_unique" class="block font-medium mt-2">Numéro unique</label>
-        <input type="text" id="numero_unique" class="w-full p-2 border rounded bg-gray-100" readonly>
+        <label for="numero_unique" class="block font-medium">Numéro unique</label>
+        <input type="text" id="numero_unique" class="w-full p-2 border rounded bg-gray-100" readonly />
       </div>
 
       <!-- ESI -->
       <div>
-        <label for="esi" class="block font-medium mt-2">ESI (logement)</label>
-        <input type="text" id="esi" class="w-full p-2 border rounded bg-gray-100" readonly>
+        <label for="esi" class="block font-medium">ESI (logement)</label>
+        <input type="text" id="esi" class="w-full p-2 border rounded bg-gray-100" readonly />
       </div>
 
       <!-- Type d’entretien -->
@@ -110,7 +108,7 @@
     </form>
   </div>
 
-  <!-- 🔒 Modale de signature (vide pour l’instant) -->
+  <!-- 🔒 Modale de signature -->
   <div id="modale-signature" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white p-4 rounded-lg shadow-lg">
       <p class="text-center">Signature ici (à venir)</p>
@@ -119,3 +117,4 @@
   </div>
 </body>
 </html>
+
