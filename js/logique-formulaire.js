@@ -139,7 +139,6 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
 });
 
 
-window.addEventListener("DOMContentLoaded", async () => {
   // 🔁 Charger établissements
   const { data: residents, error } = await supabaseClient
     .from("residents")
