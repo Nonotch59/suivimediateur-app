@@ -139,27 +139,6 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
 });
 
 
-  // 🔁 Charger établissements
-  const { data: residents, error } = await supabaseClient
-    .from("residents")
-    .select("etablissement");
-
-  if (error) {
-    console.error("❌ Erreur chargement des établissements :", error.message);
-    return;
-  }
-
-  const etablissements = [...new Set(residents.map(r => r.etablissement))];
-  console.log("✅ Établissements trouvés :", etablissements);
-
-  const selectEtab = document.getElementById("etablissement");
-  etablissements.forEach(e => {
-    const opt = document.createElement("option");
-    opt.value = e;
-    opt.textContent = e;
-    selectEtab.appendChild(opt);
-  });
-
   // 🟦 Affichage de la modale de signature
   const ouvrirBtn = document.getElementById("ouvrir-signature");
   const fermerBtn = document.getElementById("fermer-signature");
