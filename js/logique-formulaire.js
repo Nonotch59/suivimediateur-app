@@ -244,7 +244,6 @@ function envoyerFormulaire(signatureUrl) {
 }
 
 
-<script>
 // ⚙️ Initialisation complète des boutons "Effacer" et "Valider"
 window.addEventListener("DOMContentLoaded", () => {
   canvas = document.getElementById("signaturePad");
