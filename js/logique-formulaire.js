@@ -158,6 +158,58 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// 🎨 Bloc 4.3 – Activation du dessin sur le canvas
+const canvas = document.getElementById("canvas-signature");
+const ctx = canvas.getContext("2d");
+
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+function drawLine(x, y) {
+  if (!isDrawing) return;
+
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#111827"; // gris foncé
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  [lastX, lastY] = [x, y];
+}
+
+// 🎯 Souris
+canvas.addEventListener("mousedown", (e) => {
+  isDrawing = true;
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  drawLine(e.offsetX, e.offsetY);
+});
+
+canvas.addEventListener("mouseup", () => (isDrawing = false));
+canvas.addEventListener("mouseout", () => (isDrawing = false));
+
+// 📱 Écran tactile
+canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches[0];
+  isDrawing = true;
+  lastX = touch.clientX - rect.left;
+  lastY = touch.clientY - rect.top;
+});
+
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches[0];
+  drawLine(touch.clientX - rect.left, touch.clientY - rect.top);
+});
+
+canvas.addEventListener("touchend", () => (isDrawing = false));
 
 
 
