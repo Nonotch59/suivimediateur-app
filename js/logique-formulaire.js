@@ -200,7 +200,7 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
 function validerSignature() {
   console.log("🖊️ Bouton Valider cliqué");
 
-  const canvas = document.getElementById("signaturePad");
+  const canvas = document.getElementById("canvas-signature");
   const dataUrl = canvas.toDataURL();
   if (dataUrl.length < 2000) return alert("Merci de signer avant de valider.");
 
