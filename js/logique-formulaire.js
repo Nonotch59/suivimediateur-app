@@ -12,6 +12,8 @@ function resetChamps(ids) {
   });
 }
 
+let residentSelectionne = null;
+
 // 🔁 Lors du chargement de la page : charger les établissements
 window.addEventListener("DOMContentLoaded", async () => {
   const { data: residents, error } = await supabaseClient
@@ -39,6 +41,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 document.getElementById("etablissement").addEventListener("change", async (e) => {
   const selectedEtab = e.target.value;
   resetChamps(["nom", "prenom", "numero_unique", "esi"]);
+  residentSelectionne = null;
 
   if (!selectedEtab) return;
 
@@ -62,7 +65,6 @@ document.getElementById("etablissement").addEventListener("change", async (e) =>
     selectNom.appendChild(opt);
   });
 
-  // 🔄 Enregistrer les résidents filtrés pour plus tard (utilisé pour le prénom)
   window.residentsFiltres = residents;
 });
 
@@ -76,6 +78,7 @@ document.getElementById("prenom").addEventListener("change", (e) => {
   );
 
   if (resident) {
+    residentSelectionne = resident;
     document.getElementById("numero_unique").value = resident.numero_unique || "";
     document.getElementById("esi").value = resident.esi || "";
   }
@@ -100,21 +103,15 @@ document.getElementById("nom").addEventListener("change", (e) => {
   });
 });
 
-
 // ✅ Bloc 3 : Enregistrement de l’entretien
 document.getElementById("formulaire-entretien").addEventListener("submit", async (e) => {
-  e.preventDefault(); // empêche l'envoi classique
+  e.preventDefault();
 
-  const etablissement = document.getElementById("etablissement").value;
-  const nom = document.getElementById("nom").value;
-  const prenom = document.getElementById("prenom").value;
-  const numero_unique = document.getElementById("numero_unique").value;
-  const esi = document.getElementById("esi").value;
   const type_entretien = document.getElementById("type_entretien").value;
   const theme = document.getElementById("theme").value;
   const notes = document.getElementById("notes").value;
 
-  if (!etablissement || !nom || !prenom || !type_entretien || !theme) {
+  if (!residentSelectionne || !type_entretien || !theme) {
     alert("Merci de remplir tous les champs obligatoires.");
     return;
   }
@@ -123,15 +120,10 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
     .from("entretiens")
     .insert([
       {
-        etablissement,
-        nom,
-        prenom,
-        numero_unique,
-        esi,
         type_entretien,
-        themes_abordes: [theme], // ⚠️ tableau car c’est un champ array
-        notes
-        // 📌 La date est automatiquement ajoutée par Supabase (now())
+        themes_abordes: [theme],
+        notes,
+        id_resident: residentSelectionne.id
       },
     ]);
 
@@ -142,6 +134,7 @@ document.getElementById("formulaire-entretien").addEventListener("submit", async
     alert("✅ Entretien enregistré !");
     document.getElementById("formulaire-entretien").reset();
     resetChamps(["nom", "prenom", "numero_unique", "esi"]);
+    residentSelectionne = null;
   }
 });
 
