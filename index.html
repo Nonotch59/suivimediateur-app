@@ -1,35 +1,32 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espace Médiateurs - ADEF Habitat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enregistrement d’un Entretien</title>
+
+  <!-- 🎨 Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 🔌 Firebase SDK v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+  <!-- 🧠 Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <!-- 🚀 Scripts personnalisés -->
+  <script defer src="js/firebase.js"></script>
+  <script defer src="js/supabase.js"></script>
 </head>
-<body class="relative min-h-screen">
+<body class="bg-gray-100 text-gray-900">
 
-  <!-- Image de fond -->
-  <div class="absolute inset-0">
-    <img src="ADEF_HABITAT_IMAGE.jpg" alt="Photo ADEF" class="w-full h-full object-cover">
-    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-  </div>
-
-  <!-- Contenu principal -->
-  <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-white px-4">
-    <img src="LOGO_ADEF.png" alt="Logo ADEF" class="w-28 mb-6">
-    <h1 class="text-4xl md:text-5xl font-bold text-center mb-4">Espace Médiateurs</h1>
-    <p class="text-lg md:text-xl text-center mb-8">Accédez à l'outil de saisie des entretiens</p>
-
-    <!-- Bouton formulaire -->
-    <a href="formulaire.html" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition">
-      ➕ Nouveau formulaire
-    </a>
-
-    <!-- ✅ Nouveau bouton historique -->
-    <a href="historique.html" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition">
-      📄 Voir l'historique des entretiens
-    </a>
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold text-center">🔧 Initialisation réussie</h1>
+    <p class="text-center mt-2">Firebase & Supabase sont prêts.</p>
   </div>
 
 </body>
 </html>
+
