@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enregistrement d’un Entretien</title>
+
+  <!-- 🎨 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 🔌 Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+  <!-- 🧠 Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <!-- 🚀 Scripts locaux -->
+  <script defer src="js/firebase.js"></script>
+  <script defer src="js/supabase.js"></script>
+  <script defer src="js/logique-formulaire.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+  <div class="container mx-auto p-6 max-w-3xl bg-white shadow-md rounded-xl">
+    <h1 class="text-2xl font-bold text-center mb-6">📝 Enregistrement d’un Entretien</h1>
+
+    <form id="formulaire-entretien" class="space-y-4">
+
+      <!-- Établissement -->
+      <div>
+        <label for="etablissement" class="block font-medium">Établissement *</label>
+        <select id="etablissement" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un établissement --</option>
+        </select>
+      </div>
+
+      <!-- Nom -->
+      <div>
+        <label for="nom" class="block font-medium">Nom *</label>
+        <select id="nom" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un nom --</option>
+        </select>
+      </div>
+
+      <!-- Prénom -->
+      <div>
+        <label for="prenom" class="block font-medium">Prénom *</label>
+        <select id="prenom" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un prénom --</option>
+        </select>
+      </div>
+
+      <!-- Numéro unique -->
+      <div>
+        <label for="numero_unique" class="block font-medium">Numéro unique</label>
+        <input type="text" id="numero_unique" class="w-full p-2 border rounded bg-gray-100" readonly />
+      </div>
+
+      <!-- ESI -->
+      <div>
+        <label for="esi" class="block font-medium">ESI (logement)</label>
+        <input type="text" id="esi" class="w-full p-2 border rounded bg-gray-100" readonly />
+      </div>
+
+      <!-- Type d’entretien -->
+      <div>
+        <label for="type_entretien" class="block font-medium">Type d’entretien *</label>
+        <select id="type_entretien" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un type --</option>
+          <option value="individuel">Entretien individuel</option>
+          <option value="permanence">Permanence</option>
+        </select>
+      </div>
+
+      <!-- Thème -->
+      <div>
+        <label for="theme" class="block font-medium">Thème *</label>
+        <select id="theme" required class="w-full p-2 border rounded">
+          <option value="">-- Choisir un thème --</option>
+          <option value="logement">Logement</option>
+          <option value="emploi">Emploi</option>
+          <option value="santé">Santé</option>
+          <option value="administratif">Administratif</option>
+        </select>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label for="notes" class="block font-medium">Notes / remarques</label>
+        <textarea id="notes" rows="4" class="w-full p-2 border rounded"></textarea>
+      </div>
+
+      <!-- Signature -->
+      <div class="text-center">
+        <button type="button" id="ouvrir-signature" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          ✍️ Ajouter une signature
+        </button>
+      </div>
+
+      <!-- Soumission -->
+      <div class="text-center">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
+          ✅ Enregistrer l’entretien
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 🧾 Bloc 4.1 – Modale avec canvas de signature -->
+<div id="modale-signature" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-xl font-bold text-center mb-4">✍️ Signez ci-dessous</h2>
+
+    <!-- 🖌️ Zone de dessin -->
+    <canvas id="canvas-signature" width="300" height="150" class="border border-gray-400 w-full rounded"></canvas>
+
+    <!-- 🧹 Boutons Effacer + Valider -->
+    <div class="mt-4 flex justify-between">
+      <button id="effacer-signature" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Effacer</button>
+      <button id="valider-signature" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Valider</button>
+    </div>
+
+    <!-- ❌ Bouton pour fermer -->
+    <div class="mt-4 text-center">
+      <button id="fermer-signature" class="text-sm text-gray-500 underline">Fermer sans enregistrer</button>
+    </div>
+  </div>
+</div>  
+</body>
+</html>
+
