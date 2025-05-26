@@ -294,6 +294,12 @@ window.addEventListener("DOMContentLoaded", () => {
       alert("❌ Erreur lors de l'envoi de la signature.");
     }
   });
+
+function ouvrirSignature() {
+  document.getElementById("signatureModal").classList.remove("hidden");
+}
+
+  
 });
 
 
