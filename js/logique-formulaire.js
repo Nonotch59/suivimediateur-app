@@ -294,4 +294,12 @@ window.addEventListener("DOMContentLoaded", () => {
       alert("❌ Erreur lors de l'envoi de la signature.");
     }
   });
+
 });
+
+// ✅ En dehors du bloc : accessible globalement depuis le HTML
+
+function ouvrirSignature() {
+  document.getElementById("signatureModal").classList.remove("hidden");
+}
+
