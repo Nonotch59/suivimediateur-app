@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Signature</title>
+  <style>
+    canvas { border: 1px solid #000; width: 100%; max-width: 400px; height: 150px; }
+    .btn { margin: 10px 5px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+
+<h2>✍️ Signez ci-dessous</h2>
+<canvas id="signaturePad"></canvas>
+<br>
+<button class="btn" onclick="clearCanvas()">Effacer</button>
+<button class="btn" onclick="validateSignature()">Valider</button>
+
+<script>
+let isDrawing = false;
+const canvas = document.getElementById("signaturePad");
+const ctx = canvas.getContext("2d");
+
+ctx.lineWidth = 2;
+ctx.lineCap = "round";
+ctx.strokeStyle = "#111";
+
+canvas.addEventListener("mousedown", (e) => {
+  isDrawing = true;
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!isDrawing) return;
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseout", () => isDrawing = false);
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function validateSignature() {
+  const dataUrl = canvas.toDataURL();
+  if (dataUrl.length < 2000) {
+    alert("❌ Merci de signer avant de valider.");
+  } else {
+    alert("✅ Signature détectée !");
+    console.log("🎯 Data URL (base64) :", dataUrl);
+  }
+}
+</script>
+
+</body>
+</html>
