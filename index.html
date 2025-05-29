@@ -1,133 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enregistrement d’un Entretien</title>
+  <meta charset="UTF-8">
+  <title>Signature</title>
+  <style>
+    canvas {
+      border: 1px solid #000;
+      width: 100%;
+      max-width: 400px;
+      height: 150px;
+    }
+    .btn {
+      margin: 10px 5px;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
 
-  <!-- 🎨 Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <h2>✍️ Signez ci-dessous</h2>
+  <canvas id="signaturePad"></canvas><br>
+  <button class="btn" onclick="clearCanvas()">Effacer</button>
+  <button class="btn" onclick="sendSignature()">Valider</button>
 
-  <!-- 🔌 Firebase SDK -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- 🧠 Supabase CDN -->
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <!-- 🚀 Scripts locaux -->
-  <script defer src="js/firebase.js"></script>
-  <script defer src="js/supabase.js"></script>
-  <script defer src="js/logique-formulaire.js"></script>
-</head>
+  <!-- Configurations -->
+  <script src="js/firebase.js"></script>
+  <script src="js/supabase.js"></script>
 
-<body class="bg-gray-100 text-gray-900">
-  <div class="container mx-auto p-6 max-w-3xl bg-white shadow-md rounded-xl">
-    <h1 class="text-2xl font-bold text-center mb-6">📝 Enregistrement d’un Entretien</h1>
+  <!-- Logique signature -->
+  <script>
+    let isDrawing = false;
+    const canvas = document.getElementById("signaturePad");
+    const ctx = canvas.getContext("2d");
 
-    <form id="formulaire-entretien" class="space-y-4">
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#111";
 
-      <!-- Établissement -->
-      <div>
-        <label for="etablissement" class="block font-medium">Établissement *</label>
-        <select id="etablissement" required class="w-full p-2 border rounded">
-          <option value="">-- Choisir un établissement --</option>
-        </select>
-      </div>
+    canvas.addEventListener("mousedown", (e) => {
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
 
-      <!-- Nom -->
-      <div>
-        <label for="nom" class="block font-medium">Nom *</label>
-        <select id="nom" required class="w-full p-2 border rounded">
-          <option value="">-- Choisir un nom --</option>
-        </select>
-      </div>
+    canvas.addEventListener("mousemove", (e) => {
+      if (!isDrawing) return;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    });
 
-      <!-- Prénom -->
-      <div>
-        <label for="prenom" class="block font-medium">Prénom *</label>
-        <select id="prenom" required class="w-full p-2 border rounded">
-          <option value="">-- Choisir un prénom --</option>
-        </select>
-      </div>
+    canvas.addEventListener("mouseup", () => isDrawing = false);
+    canvas.addEventListener("mouseout", () => isDrawing = false);
 
-      <!-- Numéro unique -->
-      <div>
-        <label for="numero_unique" class="block font-medium">Numéro unique</label>
-        <input type="text" id="numero_unique" class="w-full p-2 border rounded bg-gray-100" readonly />
-      </div>
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
-      <!-- ESI -->
-      <div>
-        <label for="esi" class="block font-medium">ESI (logement)</label>
-        <input type="text" id="esi" class="w-full p-2 border rounded bg-gray-100" readonly />
-      </div>
+    async function sendSignature() {
+      const dataUrl = canvas.toDataURL();
+      if (dataUrl.length < 2000) {
+        alert("❌ Merci de signer avant de valider.");
+        return;
+      }
 
-      <!-- Type d’entretien -->
-      <div>
-        <label for="type_entretien" class="block font-medium">Type d’entretien *</label>
-        <select id="type_entretien" required class="w-full p-2 border rounded">
-          <option value="">-- Choisir un type --</option>
-          <option value="individuel">Entretien individuel</option>
-          <option value="permanence">Permanence</option>
-        </select>
-      </div>
+      try {
+        const id_resident = "5cf9e6df-e495-4c1a-bd36-69065c48ba03"; // à adapter si besoin
+        const fileName = `signatures/${id_resident}_${Date.now()}.png`;
 
-      <!-- Thème -->
-      <div>
-        <label for="theme" class="block font-medium">Thème *</label>
-        <select id="theme" required class="w-full p-2 border rounded">
-          <option value="">-- Choisir un thème --</option>
-          <option value="logement">Logement</option>
-          <option value="emploi">Emploi</option>
-          <option value="santé">Santé</option>
-          <option value="administratif">Administratif</option>
-        </select>
-      </div>
+        const storageRef = firebase.storage().ref().child(fileName);
+        await storageRef.putString(dataUrl, 'data_url');
+        const url = await storageRef.getDownloadURL();
 
-      <!-- Notes -->
-      <div>
-        <label for="notes" class="block font-medium">Notes / remarques</label>
-        <textarea id="notes" rows="4" class="w-full p-2 border rounded"></textarea>
-      </div>
+        const { error } = await supabase
+          .from("entretiens")
+          .insert([{
+            id_resident,
+            type_entretien: "test",
+            themes_abordes: ["signature_only"],
+            notes: "Test d'envoi simple",
+            signature_url: url
+          }]);
 
-      <!-- Signature -->
-      <div class="text-center">
-        <button type="button" id="ouvrir-signature" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          ✍️ Ajouter une signature
-        </button>
-      </div>
+        if (error) throw error;
 
-      <!-- Soumission -->
-      <div class="text-center">
-        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
-          ✅ Enregistrer l’entretien
-        </button>
-      </div>
-    </form>
-  </div>
+        alert("✅ Signature envoyée avec succès !");
+      } catch (err) {
+        console.error("Erreur :", err);
+        alert("❌ Une erreur s’est produite.");
+      }
+    }
+  </script>
 
-  <!-- 🧾 Bloc 4.1 – Modale avec canvas de signature -->
-<div id="modale-signature" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-xl font-bold text-center mb-4">✍️ Signez ci-dessous</h2>
-
-    <!-- 🖌️ Zone de dessin -->
-    <canvas id="canvas-signature" width="300" height="150" class="border border-gray-400 w-full rounded"></canvas>
-
-    <!-- 🧹 Boutons Effacer + Valider -->
-    <div class="mt-4 flex justify-between">
-      <button id="effacer-signature" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Effacer</button>
-      <button id="valider-signature" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Valider</button>
-    </div>
-
-    <!-- ❌ Bouton pour fermer -->
-    <div class="mt-4 text-center">
-      <button id="fermer-signature" class="text-sm text-gray-500 underline">Fermer sans enregistrer</button>
-    </div>
-  </div>
-</div>  
 </body>
 </html>
-
