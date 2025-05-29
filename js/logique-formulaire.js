@@ -135,7 +135,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (resident) {
       residentSelectionne = resident;
-      document.getElementById("numero_unique").value = resident.numero_unique || "";
+      document.getElementById("numero").value = resident.numero_unique || "";      
       document.getElementById("esi").value = resident.esi || "";
     }
   });
@@ -190,9 +190,9 @@ window.addEventListener("DOMContentLoaded", () => {
       const dataUrl = canvas.toDataURL();
       if (dataUrl.length < 2000) return alert("Merci de signer avant de valider.");
 
-      const id_resident = document.getElementById("numero_unique").value || document.getElementById("numero").value;
-      if (!id_resident) return alert("Résident non sélectionné");
-
+    const id_resident = document.getElementById("numero").value;
+if (!id_resident) return alert("Résident non sélectionné");
+      
       try {
         const url = await uploadSignatureToFirebase(dataUrl, id_resident);
         if (!url) return;
